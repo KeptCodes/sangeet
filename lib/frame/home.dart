@@ -33,7 +33,10 @@ class _HomeFrameState extends ConsumerState<HomeFrame>
     super.initState();
     trayManager.addListener(this);
     windowManager.addListener(this);
-    FlutterDiscordRPC.instance.connect();
+
+    FlutterDiscordRPC.instance.connect().catchError((e) {
+      debugPrint('Failed To Connect Discord');
+    });
   }
 
   @override
