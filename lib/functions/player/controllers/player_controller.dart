@@ -28,7 +28,11 @@ class PlayerController extends StateNotifier<bool> {
   final SettingsController _settingsController;
   final SangeetAPI _api;
 
-  final _player = AudioPlayer(handleAudioSessionActivation: false);
+  final _player = AudioPlayer(
+    handleInterruptions: false,
+    androidApplyAudioAttributes: false,
+    handleAudioSessionActivation: false,
+  );
   final _smtc = SMTCWindows(
     metadata: const MusicMetadata(
       title: 'Not Playing',
@@ -183,7 +187,7 @@ class PlayerController extends StateNotifier<bool> {
             smallText: "${song.title} - ${song.albumName}",
           ),
           details:
-              "Playing ${song.title} by ${song.artists[0].name} on Sangeet Desktop.",
+              "Playing ${song.title} by ${song.artists[0].name} on Sangeet.",
           buttons: [
             const RPCButton(
                 label: "Open in Sangeet",
