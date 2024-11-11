@@ -50,7 +50,9 @@ class _HomeFrameState extends ConsumerState<HomeFrame>
     windowManager.removeListener(this);
     if (!isTesting) {
       FlutterDiscordRPC.instance.clearActivity();
-      FlutterDiscordRPC.instance.disconnect();
+      FlutterDiscordRPC.instance
+          .disconnect()
+          .catchError((e) => debugPrint('Failed To Disconnect Discord'));
       FlutterDiscordRPC.instance.dispose();
     }
     super.dispose();
