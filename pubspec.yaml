@@ -37,10 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.6
   flutter_riverpod: ^2.5.1
   just_audio: ^0.9.37
-  audio_session: ^0.1.19
   rxdart: ^0.27.7
   just_audio_windows: ^0.2.1
-  audio_service: ^0.18.13
   audio_video_progress_bar: ^2.0.3
   collection: ^1.18.0
   window_manager: ^0.3.9
@@ -61,6 +59,8 @@ dependencies:
   http: ^1.2.1
   fast_cached_network_image: ^1.2.9
   context_menus: ^2.0.0+1
+  smtc_windows: ^1.0.0
+  flutter_discord_rpc: ^1.0.0
 
 dev_dependencies:
   flutter_test:

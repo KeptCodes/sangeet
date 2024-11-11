@@ -1,9 +1,10 @@
-import 'package:audio_session/audio_session.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
+import 'package:flutter_discord_rpc/flutter_discord_rpc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sangeet/core/constants.dart';
+import 'package:smtc_windows/smtc_windows.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -14,9 +15,10 @@ Future<void> initialiseAppFunctions() async {
     subDir: "${tempDir.path}/sangeet-cache",
     clearCacheAfter: const Duration(days: 15),
   );
-  final session = await AudioSession.instance;
-  await session.configure(const AudioSessionConfiguration.speech());
-  await session.setActive(false);
+  await FlutterDiscordRPC.initialize(
+    "1305200213123928174",
+  );
+  await SMTCWindows.initialize();
 }
 
 Future<void> initWindowManager() async {

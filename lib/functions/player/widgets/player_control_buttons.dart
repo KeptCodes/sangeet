@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:sangeet/functions/player/controllers/player_controller.dart';
+import 'package:sangeet_api/models.dart';
+import 'package:smtc_windows/smtc_windows.dart';
 
-class PlayerControllerButtons extends StatelessWidget {
+class PlayerControllerButtons extends ConsumerWidget {
   final AudioPlayer player;
   const PlayerControllerButtons({
     super.key,
@@ -9,7 +13,8 @@ class PlayerControllerButtons extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final smtc = ref.watch(playerControllerProvider.notifier).getSMTC;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -43,7 +48,19 @@ class PlayerControllerButtons extends StatelessWidget {
             Icons.skip_previous_rounded,
             color: Colors.white,
           ),
-          onPressed: () => player.seekToPrevious(),
+          onPressed: () async {
+            if (player.previousIndex == null) return;
+            SongModel prevSong =
+                player.audioSource?.sequence[player.previousIndex ?? 0].tag;
+            await smtc.updateMetadata(MusicMetadata(
+              title: prevSong.title,
+              album: prevSong.albumName,
+              thumbnail: prevSong.images[1].url,
+              artist: prevSong.artists[0].name,
+            ));
+            await smtc.setPlaybackStatus(PlaybackStatus.playing);
+            await player.seekToPrevious();
+          },
         ),
         StreamBuilder<PlayerState>(
           stream: player.playerStateStream,
@@ -72,7 +89,10 @@ class PlayerControllerButtons extends StatelessWidget {
                 style: IconButton.styleFrom(
                   backgroundColor: Colors.teal,
                 ),
-                onPressed: player.play,
+                onPressed: () async {
+                  await smtc.setIsPlayEnabled(true);
+                  await player.play();
+                },
               );
             } else if (processingState != ProcessingState.completed) {
               return IconButton(
@@ -84,7 +104,10 @@ class PlayerControllerButtons extends StatelessWidget {
                 style: IconButton.styleFrom(
                   backgroundColor: Colors.teal,
                 ),
-                onPressed: player.pause,
+                onPressed: () async {
+                  await smtc.setIsPlayEnabled(false);
+                  await player.pause();
+                },
               );
             } else {
               return IconButton(
@@ -106,7 +129,20 @@ class PlayerControllerButtons extends StatelessWidget {
             Icons.skip_next_rounded,
             color: Colors.white,
           ),
-          onPressed: () => player.seekToNext(),
+          onPressed: () async {
+            SongModel nextSong = player
+                .audioSource
+                ?.sequence[player.nextIndex ?? (player.sequence!.length - 1)]
+                .tag;
+            await smtc.updateMetadata(MusicMetadata(
+              title: nextSong.title,
+              album: nextSong.albumName,
+              thumbnail: nextSong.images[1].url,
+              artist: nextSong.artists[0].name,
+            ));
+            await smtc.setPlaybackStatus(PlaybackStatus.playing);
+            await player.seekToNext();
+          },
         ),
         StreamBuilder<bool>(
           stream: player.shuffleModeEnabledStream,

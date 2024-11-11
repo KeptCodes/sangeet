@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_discord_rpc/flutter_discord_rpc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:hotkey_manager/hotkey_manager.dart';
@@ -32,12 +33,15 @@ class _HomeFrameState extends ConsumerState<HomeFrame>
     super.initState();
     trayManager.addListener(this);
     windowManager.addListener(this);
+    FlutterDiscordRPC.instance.connect();
   }
 
   @override
   void dispose() {
     trayManager.removeListener(this);
     windowManager.removeListener(this);
+    FlutterDiscordRPC.instance.disconnect();
+    FlutterDiscordRPC.instance.dispose();
     super.dispose();
   }
 
