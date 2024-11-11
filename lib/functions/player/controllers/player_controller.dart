@@ -365,7 +365,6 @@ class PlayerController extends StateNotifier<bool> {
   void dispose() {
     super.dispose();
     _player.dispose();
-    FlutterDiscordRPC.instance.clearActivity();
     _smtc.dispose();
   }
 }

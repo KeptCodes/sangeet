@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_discord_rpc/flutter_discord_rpc.dart';
@@ -28,23 +30,29 @@ class HomeFrame extends ConsumerStatefulWidget {
 
 class _HomeFrameState extends ConsumerState<HomeFrame>
     with TrayListener, WindowListener {
+  bool get isTesting => Platform.environment.containsKey('FLUTTER_TEST');
+
   @override
   void initState() {
     super.initState();
     trayManager.addListener(this);
     windowManager.addListener(this);
-
-    FlutterDiscordRPC.instance.connect().catchError((e) {
-      debugPrint('Failed To Connect Discord');
-    });
+    if (!isTesting) {
+      FlutterDiscordRPC.instance.connect().catchError((e) {
+        debugPrint('Failed To Connect Discord');
+      });
+    }
   }
 
   @override
   void dispose() {
     trayManager.removeListener(this);
     windowManager.removeListener(this);
-    FlutterDiscordRPC.instance.disconnect();
-    FlutterDiscordRPC.instance.dispose();
+    if (!isTesting) {
+      FlutterDiscordRPC.instance.clearActivity();
+      FlutterDiscordRPC.instance.disconnect();
+      FlutterDiscordRPC.instance.dispose();
+    }
     super.dispose();
   }
 
