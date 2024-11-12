@@ -119,3 +119,20 @@ class TrendClass {
     this.accentColor,
   });
 }
+
+class PopMenuAction {
+  final String label;
+  final String value;
+
+  PopMenuAction({
+    required this.label,
+    required this.value,
+  });
+}
+
+List<PopMenuAction> popMenuActions = [
+  PopMenuAction(label: 'Play', value: 'play'),
+  PopMenuAction(label: 'Save to Playlist', value: 'save_playlist'),
+  PopMenuAction(label: 'Add to queue', value: 'queue'),
+  PopMenuAction(label: 'Download', value: 'downlaod'),
+];

@@ -124,7 +124,7 @@ class AlbumView extends ConsumerWidget {
                             onTap: () => Navigator.of(context).push(
                               SongView.route(song.id),
                             ),
-                            image: song.images[1].url,
+                            // image: song.images[1].url,
                             title: song.title,
                             subtitle:
                                 "${formatNumber(song.playCount)} listens, ${song.label}",

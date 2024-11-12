@@ -1,8 +1,9 @@
 import 'dart:developer';
 
-import 'package:audio_session/audio_session.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_discord_rpc/flutter_discord_rpc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
@@ -13,6 +14,7 @@ import 'package:sangeet/functions/settings/controllers/settings_controller.dart'
 import 'package:sangeet_api/models.dart';
 import 'package:sangeet_api/modules/song/models/song_model.dart';
 import 'package:sangeet_api/sangeet_api.dart';
+import 'package:smtc_windows/smtc_windows.dart';
 
 final playerControllerProvider =
     StateNotifierProvider<PlayerController, bool>((ref) {
@@ -26,7 +28,38 @@ class PlayerController extends StateNotifier<bool> {
   final SettingsController _settingsController;
   final SangeetAPI _api;
 
-  final _player = AudioPlayer();
+  final _player = AudioPlayer(
+    handleInterruptions: false,
+    androidApplyAudioAttributes: false,
+    handleAudioSessionActivation: false,
+  );
+  final _smtc = SMTCWindows(
+    metadata: const MusicMetadata(
+      title: 'Not Playing',
+      album: '',
+      albumArtist: '',
+      artist: '',
+      thumbnail: 'https://priyanshuverma-dev.github.io/card.png',
+    ),
+    // Timeline info for the OS media player
+    timeline: const PlaybackTimeline(
+      startTimeMs: 0,
+      endTimeMs: 1000,
+      positionMs: 0,
+      minSeekTimeMs: 0,
+      maxSeekTimeMs: 1000,
+    ),
+    // Which buttons to show in the OS media player
+    config: const SMTCConfig(
+      fastForwardEnabled: true,
+      nextEnabled: true,
+      pauseEnabled: true,
+      playEnabled: true,
+      rewindEnabled: true,
+      prevEnabled: true,
+      stopEnabled: true,
+    ),
+  );
   final playlist = ConcatenatingAudioSource(
     useLazyPreparation: true,
     children: [],
@@ -40,6 +73,7 @@ class PlayerController extends StateNotifier<bool> {
         super(false);
 
   AudioPlayer get getPlayer => _player;
+  SMTCWindows get getSMTC => _smtc;
   ConcatenatingAudioSource get getplaylist => playlist;
 
   Stream<PositionData> get positionDataStream =>
@@ -57,9 +91,9 @@ class PlayerController extends StateNotifier<bool> {
     List<SongModel>? prevSongs,
     bool playCurrent = false,
   }) async {
-    final session = await AudioSession.instance;
+    // final session = await AudioSession.instance;
     try {
-      await session.setActive(true);
+      // await session.setActive(true);
       List<SongModel> songs = [];
 
       if (playlist.length > 0) {
@@ -134,10 +168,95 @@ class PlayerController extends StateNotifier<bool> {
       }
 
       await _player.setAudioSource(playlist, preload: true);
-
       redirect?.call();
 
       await _player.play();
+      SongModel song = _player.audioSource?.sequence[_player.currentIndex!].tag;
+      await _smtc.updateMetadata(MusicMetadata(
+        title: song.title,
+        album: song.albumName,
+        thumbnail: song.images[1].url,
+        artist: song.artists[0].name,
+      ));
+      FlutterDiscordRPC.instance.setActivity(
+        activity: RPCActivity(
+          activityType: ActivityType.listening,
+          state: "${song.title} Playing Now",
+          assets: RPCAssets(
+            largeImage: song.images[2].url,
+            smallText: "${song.title} - ${song.albumName}",
+          ),
+          details:
+              "Playing ${song.title} by ${song.artists[0].name} on Sangeet.",
+          buttons: [
+            const RPCButton(
+                label: "Open in Sangeet",
+                url: 'https://github.com/priyanshuverma-dev/sangeet')
+          ],
+        ),
+      );
+
+      _player.currentIndexStream.listen((indx) async {
+        SongModel currentSong = _player.audioSource?.sequence[indx ?? 0].tag;
+        await _smtc.updateMetadata(MusicMetadata(
+          title: currentSong.title,
+          album: currentSong.albumName,
+          thumbnail: currentSong.images[1].url,
+          artist: currentSong.artists[0].name,
+        ));
+        await FlutterDiscordRPC.instance.setActivity(
+          activity: RPCActivity(
+            activityType: ActivityType.listening,
+            state: "${currentSong.title} Playing Now",
+            assets: RPCAssets(
+              largeImage: currentSong.images[2].url,
+              smallText: "${currentSong.title} - ${currentSong.albumName}",
+            ),
+            details:
+                "${currentSong.title} by ${currentSong.artists[0].name} on Sangeet Desktop.",
+            buttons: [
+              const RPCButton(
+                  label: "Open in Sangeet",
+                  url: 'https://github.com/priyanshuverma-dev/sangeet')
+            ],
+          ),
+        );
+      });
+
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        try {
+          _smtc.buttonPressStream.listen((event) async {
+            switch (event) {
+              case PressedButton.play:
+                _smtc.setPlaybackStatus(PlaybackStatus.playing);
+                await _player.play();
+                break;
+              case PressedButton.pause:
+                _smtc.setPlaybackStatus(PlaybackStatus.paused);
+                await _player.pause();
+                break;
+              case PressedButton.next:
+                await _smtc.setPlaybackStatus(PlaybackStatus.playing);
+                await _player.seekToNext();
+                break;
+              case PressedButton.previous:
+                await _smtc.setPlaybackStatus(PlaybackStatus.playing);
+                await _player.seekToPrevious();
+
+                break;
+              case PressedButton.stop:
+                _smtc.setPlaybackStatus(PlaybackStatus.stopped);
+                _smtc.disableSmtc();
+                await _player.stop();
+                break;
+              default:
+                break;
+            }
+          });
+        } catch (e) {
+          debugPrint("Error: $e");
+        }
+      });
     } on PlayerException catch (e) {
       if (kDebugMode) {
         print("Error message: ${e.message}");
@@ -154,7 +273,7 @@ class PlayerController extends StateNotifier<bool> {
       }
       BotToast.showText(text: "Error: ${e.toString()}");
     } finally {
-      await session.setActive(false);
+      // await session.setActive(false);
     }
   }
 
@@ -246,5 +365,6 @@ class PlayerController extends StateNotifier<bool> {
   void dispose() {
     super.dispose();
     _player.dispose();
+    _smtc.dispose();
   }
 }

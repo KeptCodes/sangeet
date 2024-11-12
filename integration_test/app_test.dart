@@ -17,8 +17,9 @@ void main() {
       await app.main();
       await tester.pumpAndSettle();
 
-      final albumCard = find.byKey(const Key("album_card_0"));
+      final albumCard = find.byKey(const Key("album_card_1"));
       mediaName = (albumCard.evaluate().first.widget as BrowseCard).title;
+      await tester.ensureVisible(albumCard);
       await tester.tap(albumCard);
       await tester.pumpAndSettle();
 

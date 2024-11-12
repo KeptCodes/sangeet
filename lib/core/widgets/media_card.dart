@@ -1,9 +1,10 @@
 import 'package:context_menus/context_menus.dart';
 import 'package:flutter/material.dart';
+import 'package:sangeet/core/core.dart';
 import 'cache_image.dart';
 
 class MediaCard extends StatelessWidget {
-  final String image;
+  final String? image;
   final String title;
   final String subtitle;
   final IconData? badgeIcon;
@@ -17,7 +18,7 @@ class MediaCard extends StatelessWidget {
   const MediaCard({
     super.key,
     required this.onTap,
-    required this.image,
+    this.image,
     this.accentColor,
     required this.title,
     required this.subtitle,
@@ -53,26 +54,27 @@ class MediaCard extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Badge(
-                      isLabelVisible: badgeIcon != null,
-                      backgroundColor:
-                          explicitContent ? Colors.redAccent : Colors.teal,
-                      label: Icon(
-                        badgeIcon,
-                        size: 10,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(8),
-                          topLeft: Radius.circular(8),
+                    if (image != null)
+                      (Badge(
+                        isLabelVisible: badgeIcon != null,
+                        backgroundColor:
+                            explicitContent ? Colors.redAccent : Colors.teal,
+                        label: Icon(
+                          badgeIcon,
+                          size: 10,
                         ),
-                        child: CacheImage(
-                          url: image,
-                          width: 60,
-                          height: 60,
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(8),
+                            topLeft: Radius.circular(8),
+                          ),
+                          child: CacheImage(
+                            url: image!,
+                            width: 60,
+                            height: 60,
+                          ),
                         ),
-                      ),
-                    ),
+                      )),
                     Flexible(
                       child: Container(
                         padding: const EdgeInsets.all(8.0),
@@ -105,10 +107,17 @@ class MediaCard extends StatelessWidget {
               ),
               Visibility(
                 visible: showMenu,
-                child: IconButton(
+                child: PopupMenuButton(
                   tooltip: "Options",
-                  onPressed: onMenuTap ?? () {},
-                  icon: const Icon(Icons.more_vert_rounded),
+                  onSelected: (value) {},
+                  itemBuilder: (BuildContext context) {
+                    return popMenuActions.map((PopMenuAction choice) {
+                      return PopupMenuItem<String>(
+                        value: choice.value,
+                        child: Text(choice.label),
+                      );
+                    }).toList();
+                  },
                 ),
               ),
             ],

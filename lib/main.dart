@@ -5,6 +5,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
+import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 
 import 'package:sangeet/frame/home.dart';
 import 'package:sangeet/initialization.dart';
@@ -12,6 +13,13 @@ import 'package:sangeet/initialization.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await hotKeyManager.unregisterAll();
+  JustAudioMediaKit.ensureInitialized();
+  JustAudioMediaKit.ensureInitialized(
+    linux: false, // default: true  - dependency: media_kit_libs_linux
+    windows: true,
+  );
+  JustAudioMediaKit.title = 'Sangeet';
+  JustAudioMediaKit.prefetchPlaylist = true;
   await initialiseAppFunctions();
   runApp(
     const ProviderScope(

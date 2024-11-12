@@ -92,7 +92,7 @@ class ArtistView extends ConsumerWidget {
                             onTap: () => Navigator.of(context).push(
                               SongView.route(song.id),
                             ),
-                            image: song.images[1].url,
+                            // image: song.images[1].url,s
                             title: song.title,
                             subtitle:
                                 "${song.label}, ${formatDuration(song.duration)}",
