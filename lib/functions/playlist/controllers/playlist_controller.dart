@@ -36,7 +36,7 @@ class PlaylistController extends StateNotifier<bool> {
     );
 
     final s = playlist.copyWith(
-      accentColor: accentColor.background,
+      accentColor: accentColor.surface,
     );
 
     return s;

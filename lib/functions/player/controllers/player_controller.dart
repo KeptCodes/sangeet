@@ -181,10 +181,10 @@ class PlayerController extends StateNotifier<bool> {
       FlutterDiscordRPC.instance.setActivity(
         activity: RPCActivity(
           activityType: ActivityType.listening,
-          state: "${song.title} Playing Now",
+          state: "${song.title} - ${song.albumName}",
           assets: RPCAssets(
             largeImage: song.images[2].url,
-            smallText: "${song.title} - ${song.albumName}",
+            smallText: "${song.title} Playing Now",
           ),
           details:
               "Playing ${song.title} by ${song.artists[0].name} on Sangeet.",

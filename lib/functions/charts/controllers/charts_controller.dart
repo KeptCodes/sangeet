@@ -36,7 +36,7 @@ class ChartController extends StateNotifier<bool> {
     );
 
     final s = chart.copyWith(
-      accentColor: accentColor.background,
+      accentColor: accentColor.surface,
     );
 
     return s;
