@@ -358,7 +358,7 @@ class _HomeFrameState extends ConsumerState<HomeFrame>
               child: const Text('Close'),
               onPressed: () async {
                 Navigator.of(context).pop();
-                await windowManager.close();
+                await windowManager.destroy();
               },
             ),
           ],
