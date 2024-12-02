@@ -35,7 +35,7 @@ class ArtistController extends StateNotifier<bool> {
     );
 
     final s = artist.copyWith(
-      accentColor: accentColor.background,
+      accentColor: accentColor.surface,
     );
 
     return s;

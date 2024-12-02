@@ -40,8 +40,8 @@ class _SearchViewState extends ConsumerState<SearchView> {
           builder: (context, controller) {
             return SearchBar(
               controller: controller,
-              backgroundColor: MaterialStateProperty.all(Colors.transparent),
-              padding: const MaterialStatePropertyAll<EdgeInsets>(
+              backgroundColor: WidgetStateProperty.all(Colors.transparent),
+              padding: const WidgetStatePropertyAll<EdgeInsets>(
                   EdgeInsets.symmetric(horizontal: 16.0)),
               onTap: () {
                 controller.openView();
@@ -173,7 +173,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
                                 .push(AlbumView.route(item.id)),
                             image: item.images[1].url,
                             title: item.title,
-                            subtitle: item.description,
+                            subtitle: item.subtitle ?? "",
                             explicitContent: item.explicitContent,
                             badgeIcon: Icons.album_rounded,
                             showMenu: false,
@@ -196,7 +196,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
                                 .push(ArtistView.route(item.id)),
                             image: item.images[1].url,
                             title: item.title,
-                            subtitle: item.description,
+                            subtitle: "",
                             explicitContent: false,
                             badgeIcon: Icons.mic_external_on_rounded,
                             showMenu: false,
@@ -219,7 +219,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
                                 .push(PlaylistView.route(item.id)),
                             image: item.images[1].url,
                             title: item.title,
-                            subtitle: item.description,
+                            subtitle: item.subtitle,
                             explicitContent: item.explicitContent,
                             badgeIcon: Icons.album_rounded,
                             showMenu: false,

@@ -34,7 +34,7 @@ class SongController extends StateNotifier<bool> {
     );
 
     final s = song.copyWith(
-      accentColor: accentColor.background,
+      accentColor: accentColor.surface,
     );
 
     return s;
