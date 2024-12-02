@@ -668,7 +668,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "3e1d5ce0aab8de462a4511b64ededf5ed9540d95"
+      resolved-ref: "d6b202c12cee0e67ebaa10fbd836eaed363f0db7"
       url: "https://github.com/priyanshuverma-dev/sangeet-api"
     source: git
     version: "0.1.3"
